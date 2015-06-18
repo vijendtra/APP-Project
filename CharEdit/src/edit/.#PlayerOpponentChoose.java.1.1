@@ -1,0 +1,67 @@
+package edit;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+
+// The first frame, allows for choosing of Player or Opponent Character to be created, edited or saved
+public class PlayerOpponentChoose {
+
+	MainFrame t3;
+	int choosen;
+	JFrame frame;
+	
+	public void choosenType() {
+		// Creates the frame and set up the button
+		frame = new JFrame();
+		JPanel panel = new JPanel();
+		JButton player = new JButton("Player");
+		JButton opponent = new JButton("Opponent");
+		player.addActionListener(new PlayerListener());
+		opponent.addActionListener(new OpponentListener());
+		panel.add(player);
+		panel.add(opponent);
+		frame.getContentPane().add(BorderLayout.CENTER, panel);
+		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+		frame.setSize(300,70);
+		frame.setVisible(true);
+	}
+	
+	// Listenser class for the Player button
+	class PlayerListener implements ActionListener {
+		public void actionPerformed(ActionEvent ev) {
+			choosen = 1;
+			System.out.println(choosen);
+			frame.setVisible(false);
+			frame.dispose();
+			// Calls MainFrame class with the variable choosen set for player
+			t3 = new MainFrame(choosen);
+			
+		}
+	}
+	
+	// Listener class for the Opponent Button
+	class OpponentListener implements ActionListener {
+		public void actionPerformed(ActionEvent ev) {
+			choosen = 0;
+			System.out.println(choosen);
+			frame.setVisible(false);
+			frame.dispose();
+			// Calls MainFrame class with the variable choosen set for opponent
+			t3 = new MainFrame(choosen);
+		}
+	}
+	
+	// Function to return what was choosen as an integer
+	public int getChoosen() {
+		return choosen;
+	}
+
+	
+//	public static void main(String[] args) {
+//		PlayerOpponentChoose t = new PlayerOpponentChoose();
+//		t.choosenType();
+
+//	}
+
+}

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring accessors="true" comment="Delete 4 elements from project &apos;FactoryPatter&apos;&#x0D;&#x0A;- Original project: &apos;FactoryPatter&apos;&#x0D;&#x0A;- Original elements:&#x0D;&#x0A;     factory.LastFirst.java&#x0D;&#x0A;     factory.NameFactory.java&#x0D;&#x0A;     factory.Namer.java&#x0D;&#x0A;     factory.Shape.java" description="Delete elements" element1="/src&lt;factory{Shape.java" element2="/src&lt;factory{NameFactory.java" element3="/src&lt;factory{LastFirst.java" element4="/src&lt;factory{Namer.java" elements="4" flags="589830" id="org.eclipse.jdt.ui.delete" resources="0" stamp="1398265888275" subPackages="false" version="1.0"/>
+</session>

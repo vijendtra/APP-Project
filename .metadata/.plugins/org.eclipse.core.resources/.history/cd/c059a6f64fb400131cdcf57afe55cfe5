@@ -1,0 +1,269 @@
+package race;
+
+import header.*;
+
+import javax.swing.*;
+
+import java.awt.*;
+import java.awt.event.*;
+
+public class Launch extends JPanel implements KeyListener, Runnable {
+	static JFrame frame;
+	MapHandler m;
+	RaceType r;
+
+	static Opponent o;
+	Graphics gt;
+	static Thread t;
+boolean collision1=false;
+boolean collision2=false;
+static JPanel log;
+static JLabel playerlog;
+int lastpick=0;
+//Rotate rt;
+	
+	//String player="player stable";
+
+
+	/*public Launch(String s) {
+		m = new MapHandler(s, 20);
+		r = new RaceType.Builder().name("Vijendra").build();
+		System.out.println(m.getPlayerX() + " " + m.getPlayerY());
+		r.setPlayer(m.getPlayerX(), m.getPlayerY());
+		o = new Opponent(m);
+		o.setOpponent(m.getoX(), m.getoY());
+		go();
+	}*/
+
+	
+	  public Launch() { m = new MapHandler("testmap.txt", 20); r = new RaceType.Builder().name("Vijendra").build();
+	   System.out.println(m.getPlayerX() + " " + m.getPlayerY());
+	  r.setPlayer(m.getPlayerX(), m.getPlayerY()); o=new Opponent(m);
+	  o.setOpponent(m.getoX(), m.getoY());
+	   //rt=new Rotate();
+	
+	 //go(); 
+	  }
+	 
+	public void paint(Graphics g) {
+		Graphics2D gg = (Graphics2D) g;
+		m.draw(gg);
+		r.paint(gg);
+		o.paint(gg);
+		if(collision1)
+			System.out.println("Collision1 one Done");
+		if(collision2)
+			System.out.println("Collision two  Done");
+		
+
+	}
+
+	 public static void main(String[] args) {
+	//public void go() {
+		 
+		frame = new JFrame();
+
+
+	    Launch l = new Launch();
+		Thread t = new Thread(o);
+		t.start();
+		log=new JPanel();
+		
+		log.setBounds(20, 500, 150, 150);
+		playerlog=new JLabel("player is Stable");
+		log.add(playerlog);
+		frame.add(log);
+		JButton jb=new JButton("Start Dies");
+		jb.setSize(new Dimension(100, 50));
+		jb.setLocation(850, 10);
+		frame.add(jb);
+		//l.collision();
+		//Thread t2 = new Thread(this);
+		Thread t2 = new Thread(l);
+		t2.start();
+
+		log=new JPanel();
+		log.setBounds(20, 500, 150, 150);
+		playerlog=new JLabel("player is Stable");
+		log.add(playerlog);
+		frame.add(log);
+		// Launch l = new Launch();
+
+		//frame.addKeyListener(this);
+		 frame.addKeyListener(l);
+		//frame.add(this);
+		frame.add(l);
+		// t=new Thread(l);
+		frame.setSize(1000, 700);
+		frame.setVisible(true);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+	}
+	
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+
+		int xArray = r.getX();
+		int yArray = r.getY();
+
+		//if (e.getKeyCode() == KeyEvent.VK_UP){
+
+		if (e.getKeyCode() == KeyEvent.VK_UP)
+		{
+
+			xArray -= 1;
+
+			playerlog.setText("Player moved up");
+			frame.repaint();}
+
+		if (e.getKeyCode() == KeyEvent.VK_DOWN){
+
+			playerlog.setText("Player moved up");
+			frame.repaint();
+			
+		}
+		if (e.getKeyCode() == KeyEvent.VK_DOWN)
+		{
+
+			xArray += 1;
+
+			
+			playerlog.setText("Player moved down");
+			frame.repaint();}
+
+		if (e.getKeyCode() == KeyEvent.VK_LEFT){
+
+			playerlog.setText("Player moved down");
+			frame.repaint();
+		}
+		if (e.getKeyCode() == KeyEvent.VK_LEFT)
+		{
+
+			yArray -= 1;
+
+			playerlog.setText("Player moved left");
+			frame.repaint();}
+
+		if (e.getKeyCode() == KeyEvent.VK_RIGHT){
+
+			playerlog.setText("Player moved left");
+			frame.repaint();
+		}
+		if (e.getKeyCode() == KeyEvent.VK_RIGHT)
+		{
+
+			yArray += 1;
+
+			playerlog.setText("Player moved right");
+			frame.repaint();}
+		if(e.getKeyCode()==80)
+		{
+			playerlog.setText("Player collected an object");
+			lastpick=m.map[xArray][yArray];
+			m.map[xArray][yArray]=1;
+		}
+		
+		if(e.getKeyCode()==68)
+		{
+			playerlog.setText("Player released last object collected");
+			m.map[xArray][yArray]=lastpick;
+		}
+
+
+			playerlog.setText("Player moved right");
+			frame.repaint();
+			//}
+		if(e.getKeyCode()==80)
+		{
+			playerlog.setText("Player collected an object");
+			lastpick=m.map[xArray][yArray];
+			m.map[xArray][yArray]=1;
+		}
+		
+		if(e.getKeyCode()==68)
+		{
+			playerlog.setText("Player released last object collected");
+			m.map[xArray][yArray]=lastpick;
+		}
+		
+
+		System.out.println("xArray and yArray: " + xArray + " " + yArray);
+		if (!m.isBlack(xArray, yArray)) {
+			
+			r.setPlayer(xArray, yArray);
+			collision1();
+
+			repaint();
+		}
+
+		else
+		{
+			playerlog.setText("player can't move");
+			frame.repaint();
+		} 
+
+		//}
+		
+
+	}
+	
+	@Override
+	public void keyReleased(KeyEvent e) {
+	
+	
+	}
+
+	@Override
+	public void keyTyped(KeyEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+	//when player attacks
+public void collision1(){
+	
+	Rectangle rectangle1=r.bounds();
+	Rectangle rectangle2=o.bounds();
+	System.out.println("value of r1"+rectangle1);
+	System.out.println("value of r2"+rectangle2);
+	if(rectangle1.intersects(rectangle2))
+	    
+		collision1=true;
+
+	else
+		collision1=false;
+}
+//when opponent attacks
+public void collision2(){
+	
+	Rectangle rectangle1=r.bounds();
+	Rectangle rectangle2=o.bounds();
+	System.out.println("value of r1 from collision2"+rectangle1);
+	System.out.println("value of r2 from collision2"+rectangle2);
+	if(rectangle2.intersects(rectangle1))
+	    
+		collision2=true;
+
+	else
+		collision2=false;
+}
+
+	@Override
+	public void run() {
+		
+		while (true) {
+			
+
+				
+
+			   repaint();	
+			  
+				
+			
+			
+		}
+		// TODO Auto-generated method stub
+
+	}
+
+}

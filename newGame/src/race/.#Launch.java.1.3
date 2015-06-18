@@ -1,0 +1,231 @@
+package race;
+
+import header.*;
+
+import javax.swing.*;
+
+import java.awt.*;
+import java.awt.event.*;
+
+public class Launch extends JPanel implements KeyListener, ActionListener {
+	static JFrame frame;
+	MapHandler m;
+	RaceType r;
+
+	static Opponent o;
+	Graphics gt;
+	static Thread t, t2;
+	boolean collision1 = false;
+	boolean collision2 = false;
+	static JPanel log;
+	static JLabel playerlog;
+	int lastpick = 0;
+	static Launch l;
+
+	// String player="player stable";
+
+	
+	  public Launch(String s) { m = new MapHandler(s, 20); r = new
+	  RaceType.Builder().name("Vijendra").build();
+	  System.out.println(m.getPlayerX() + " " + m.getPlayerY());
+	 r.setPlayer(m.getPlayerX(), m.getPlayerY()); o = new Opponent(m);
+	  o.setOpponent(m.getoX(), m.getoY()); go(); }
+	 
+
+	/*public Launch() {
+		m = new MapHandler("testmap.txt", 20);
+		r = new RaceType.Builder().name("Vijendra").build();
+
+		System.out.println(m.getPlayerX() + " " + m.getPlayerY());
+		r.setPlayer(m.getPlayerX(), m.getPlayerY());
+		o = new Opponent(m);
+		o.setOpponent(m.getoX(), m.getoY());
+		// rt=new Rotate();
+
+		// go();
+
+	}*/
+
+	public void paint(Graphics g) {
+		Graphics2D gg = (Graphics2D) g;
+		m.draw(gg);
+		r.paint(gg);
+		o.paint(gg);
+		if (collision1)
+			System.out.println("Collision1 one Done");
+		if (collision2)
+			System.out.println("Collision two  Done");
+
+	}
+
+	//public static void main(String[] args) {
+		 public void go() {
+		frame = new JFrame();
+
+		//l = new Launch();
+
+		log = new JPanel();
+
+		log.setBounds(20, 500, 150, 150);
+		playerlog = new JLabel("player is Stable");
+		log.add(playerlog);
+		frame.add(log);
+
+		// l.collision();
+
+		 frame.add(this);
+		//frame.add(l);
+
+		frame.setSize(1000, 700);
+		frame.setVisible(true);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		JPanel j = new JPanel();
+		JButton jb = new JButton("Roll Dies");
+		j.add(jb);
+		frame.add(BorderLayout.EAST, j);
+		frame.requestFocusInWindow();
+		//jb.addActionListener(l);
+		jb.addActionListener(this);
+
+	}
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+
+		int xArray = r.getX();
+		int yArray = r.getY();
+
+		if (e.getKeyCode() == KeyEvent.VK_UP) {
+
+			xArray -= 1;
+
+			playerlog.setText("Player moved up");
+			frame.repaint();
+		}
+
+		if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+
+			xArray += 1;
+
+			playerlog.setText("Player moved down");
+			frame.repaint();
+
+		}
+
+		if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+
+			yArray -= 1;
+
+			playerlog.setText("Player moved left");
+			frame.repaint();
+		}
+
+		if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+
+			yArray += 1;
+
+			playerlog.setText("Player moved right");
+			frame.repaint();
+		}
+
+		if (e.getKeyCode() == 80) {
+			playerlog.setText("Player collected an object");
+			lastpick = m.map[xArray][yArray];
+			m.map[xArray][yArray] = 1;
+		}
+
+		if (e.getKeyCode() == 68) {
+			playerlog.setText("Player released last object collected");
+			lastpick = m.map[xArray][yArray];
+			m.map[xArray][yArray] = lastpick;
+		}
+
+		System.out.println("xArray and yArray: " + xArray + " " + yArray);
+		if (!m.isBlack(xArray, yArray)) {
+
+			r.setPlayer(xArray, yArray);
+
+			o.move();
+			collision1();
+			repaint();
+
+		}
+
+		else {
+			playerlog.setText("player can't move");
+			frame.repaint();
+		}
+
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
+
+	}
+
+	@Override
+	public void keyTyped(KeyEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	// when player attacks
+	public void collision1() {
+
+		Rectangle rectangle1 = r.bounds();
+		Rectangle rectangle2 = o.bounds();
+		System.out.println("value of r1" + rectangle1);
+		System.out.println("value of r2" + rectangle2);
+	//	if (rectangle1.intersects(rectangle2))
+		System.out.println("value of ox" + o.getX());
+		System.out.println("value of oy" + o.getY());
+		if (rectangle1.contains(o.getY()*20, o.getX()*20))
+			collision1 = true;
+
+		else
+			collision1 = false;
+	}
+
+	// when opponent attacks
+	public void collision2() {
+
+		Rectangle rectangle1 = r.bounds();
+		Rectangle rectangle2 = o.bounds();
+		System.out.println("value of r1 from collision2" + rectangle1);
+		System.out.println("value of r2 from collision2" + rectangle2);
+		if (rectangle2.intersects(rectangle1))
+
+			collision2 = true;
+
+		else
+			collision2 = false;
+	}
+
+	public void actionPerformed(ActionEvent arg0) {
+
+		double p = r.iR();
+		double q = o.iO();
+		System.out.println(p);
+		System.out.println(q);
+		if (p > q) {
+
+			frame.requestFocusInWindow();
+			
+			//frame.addKeyListener(l);
+			frame.addKeyListener(this);
+
+		} else {
+
+			o.move();
+            frame.requestFocusInWindow();
+			
+			//frame.addKeyListener(l);
+			frame.addKeyListener(this);
+			repaint();
+			
+		
+		}
+	}
+
+}

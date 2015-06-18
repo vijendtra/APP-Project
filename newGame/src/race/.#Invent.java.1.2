@@ -1,0 +1,246 @@
+package race;
+
+
+
+import header.ChestItems;
+import header.Items;
+import header.Items.Builder;
+import header.RaceType;
+
+import javax.swing.*;
+
+import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Iterator;
+
+import javax.swing.event.*;
+
+/**
+ * Invent class provides the player inventory
+ * Invent constructor display the list of the items player consist of and provide buttons to drop items
+ * method savePlayer will save the player details into RaceType object and to the file after modification
+ * method readPlayer will read the contents of the file to the RaceType object
+ * inner class dropActionListener will implement the actionEvents of button
+ * inner class ListSelect to implement the listSelectionEvents of lists
+ * @param player file name to read and save player details to and form file
+ * @author Team3
+ *
+ */
+	public class Invent implements Serializable {
+		String pnm,prac,pcl;
+		JFrame frame;
+		JScrollPane listScroll;
+		JList list;
+		
+		String name,player,select,selectedinv;
+		RaceType r;
+		Items pwn,parm,pshd;
+		ArrayList<ChestItems>  ci;
+		ArrayList<Items> pi;
+		ArrayList<Items> ii;
+		ArrayList<ChestItems>  cis;
+
+		public  void savePlayer(String pl)
+		{
+			try {
+				FileOutputStream fout = new FileOutputStream(pl);
+				ObjectOutputStream oos = new ObjectOutputStream(fout);
+				oos.writeObject(r);
+				oos.close();
+				System.out.println("Object Written");
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+			
+		}
+		public void readPlayer(String pl)
+		{
+			try {
+				FileInputStream fin = new FileInputStream(pl);
+				ObjectInputStream ois = new ObjectInputStream(fin);
+				r = (RaceType) ois.readObject();
+				ois.close();
+			} catch (Exception ev) {
+				System.out.println(ev.getMessage());
+			}
+			return;
+		}
+		
+		public Invent(RaceType ra,ArrayList<ChestItems> cii,ArrayList<Items> i,String playe) {
+			player=playe;
+			
+			//readPlayer(player);
+			r=ra;
+			this.ci=cii;
+			this.pi=i;
+			pnm=r.getName();
+			prac=r.getRace();
+			pcl=r.getClassType();
+			pwn=r.getWeapon();
+			parm=r.getArmor();
+			pshd=r.getShield();
+			frame = new JFrame();
+			JPanel south = new JPanel();
+			JPanel play =new JPanel();
+			play.setLayout(new BoxLayout(play,BoxLayout.Y_AXIS));
+			JLabel pname = new JLabel("Name :"+r.getName());
+			JLabel prace=new JLabel("Race :" +r.getRace());
+			JLabel pclass=new JLabel("Class"+r.getClassType());
+			JLabel name = new JLabel("Select Item");
+			play.add(pname);
+			play.add(prace);
+			play.add(pclass);
+			play.add(name);
+			Hashtable<String,Integer> map=new Hashtable<String,Integer>();
+			if(r.getArmor()!=null)
+			map.put(r.getArmor().getName(), 1);
+			if(r.getShield()!=null)
+				map.put(r.getShield().getName(), 1);
+			if(r.getWeapon()!=null)
+				map.put(r.getWeapon().getName(), 1);
+			if(r.getInventory()!=null)
+			{
+				//System.out.println("inventory"+r.getInventory());
+				ii=r.getInventory();
+				for(Items pitem:ii)
+				{
+					if(pitem.getName()!=null)
+					{
+						selectedinv= pitem.getName();
+						map.put(pitem.getName(), 1);
+				}
+				}
+			}
+			
+			if(r.getChestItems()!=null)
+			{
+				//System.out.println("inventory"+r.getInventory());
+				cis=r.getChestItems();
+				for(ChestItems pitem:cis)
+				{
+					if(pitem.getName()!=null)
+					{
+						
+						map.put(pitem.getName(), 1);
+				}
+				}
+			}
+			
+		
+			list = new JList(map.keySet().toArray());
+			listScroll = new JScrollPane(list);
+			frame.getContentPane().add(BorderLayout.NORTH,play);
+			//frame.getContentPane().add(BorderLayout.NORTH, name);
+			list.addListSelectionListener(new listSelect());
+			
+			frame.getContentPane().add(BorderLayout.CENTER, listScroll);
+			//JButton drop = new JButton("drop");
+			JButton backpack = new JButton("backpack");
+			JButton unequip = new JButton("unequip");
+			//south.add(drop);
+			south.add(backpack);
+			south.add(unequip);
+			backpack.addActionListener(new equipListener());
+			//backpack.addActionListener(new equipListener());
+			unequip.addActionListener(new unequipListener());
+			frame.getContentPane().add(BorderLayout.SOUTH, south);
+			frame.setSize(350, 350);
+			frame.setVisible(true);
+			frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+		}
+		
+		
+		
+		
+		class equipListener implements ActionListener {
+			public void actionPerformed(ActionEvent e) {
+				BackPack bp= new BackPack(player,r,ci,pi);
+				frame.setVisible(false);
+				frame.dispose();
+						
+			}
+		}
+		class unequipListener implements ActionListener {
+			public void actionPerformed(ActionEvent e) {
+				
+				String[] weaps = new String[]{"Bow n Arrow", "Dagger", "Spear", "Sword"};
+				String[] armor = new String[]{"Padded","Leather", "Studded Leather", "Chaio Shirt", "Breastplate", "Banded Mail", "Half Plate", "Full Plate"};
+				String[] shld = new String[]{"Buckler", "Heavy Shield", "Tower Shield"};
+				String[] chesti = new String[]{"Helmet", "Armor", "Belt","Boots", "Bracers", "Ring", "SwordAndBow", "Shield"};
+				
+				
+				for(String ss:armor)
+				{								
+					if(select.equals(ss))
+					{		
+						pi.add(r.getArmor());
+						r.setArmor(null);
+						savePlayer(player);
+						frame.setVisible(false);	
+						frame.dispose();
+					}
+				}
+				for(String ss:weaps)
+				{								
+					if(select.equals(ss))
+					{						
+						pi.add(r.getWeapon());
+						r.setWeapon(null);
+						savePlayer(player);
+						frame.setVisible(false);	
+						frame.dispose();
+					}
+				}
+				for(String ss:shld)
+				{							
+					if(select.equals(ss))
+					{						
+						pi.add(r.getShield());
+						r.setShield(null);
+						savePlayer(player);
+						frame.setVisible(false);	
+						frame.dispose();
+					}
+				}
+				for(String ss:chesti)
+				{
+					if(select.equals(ss))
+					{
+						Iterator<ChestItems> ia=r.getChestItems().iterator();
+						while(ia.hasNext())
+						{
+							ChestItems a= ia.next();
+							if(select.equals(a.getName()))
+							{
+								ci.add(a);
+								ia.remove();
+							}
+						}
+						
+					}
+				}
+				frame.setVisible(false);
+				frame.dispose();
+				
+						
+			}
+		}
+		
+		class listSelect implements ListSelectionListener {
+			public void valueChanged(ListSelectionEvent ev) {
+			
+				if(!ev.getValueIsAdjusting()) {
+					select =list.getSelectedValue().toString();
+					
+				}
+			}
+		}
+		
+	
+
+
+}
